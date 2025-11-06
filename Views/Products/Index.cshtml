@@ -1,0 +1,100 @@
+﻿@model IEnumerable<BabyShop.Models.Product>
+
+@{
+    ViewData["Title"] = "Products by Category";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Prepare distinct category list for the dropdown
+    var categories = Model?.Select(p => p.Category)
+                           .Distinct()
+                           .OrderBy(c => c)
+                           .ToList() ?? new List<string>();
+
+    // ✅ Get selected category safely
+    var selectedCategory = ViewContext.HttpContext.Request.Query["category"].ToString();
+}
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4 text-primary fw-bold">Our Baby Products 🍼</h1>
+
+    <!-- Category Filter -->
+    <div class="d-flex justify-content-center mb-4">
+        <form method="get" asp-action="Index" asp-controller="Products">
+            <div class="input-group" style="max-width: 400px;">
+                <select name="category" class="form-select">
+                    <option value="">-- All Categories --</option>
+                    @foreach (var cat in categories)
+                    {
+                        <option value="@cat" selected="@(selectedCategory == cat ? "selected" : null)">
+                            @cat
+                        </option>
+                    }
+                </select>
+                <button type="submit" class="btn btn-pink text-white fw-bold">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        var groupedProducts = Model.GroupBy(p => p.Category);
+
+        foreach (var categoryGroup in groupedProducts)
+        {
+            <h3 class="text-secondary mt-5 mb-3 border-bottom pb-2">@categoryGroup.Key</h3>
+
+            <div class="row">
+                @foreach (var item in categoryGroup)
+                {
+                    <div class="col-md-3 mb-4">
+                        <div class="card shadow-sm border-0 h-100 text-center">
+                            <img src="@item.ImageUrl"
+                                 alt="@item.Name"
+                                 class="card-img-top rounded"
+                                 style="height: 200px; object-fit: contain;" />
+
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">@item.Name</h5>
+                                <h6 class="text-success fw-bold">₹@item.Price</h6>
+
+                                <a asp-controller="Products"
+                                   asp-action="Details"
+                                   asp-route-id="@item.ProductId"
+                                   class="btn btn-outline-primary btn-sm mt-2">Details</a>
+
+                                <a asp-controller="Products"
+                                   asp-action="Edit"
+                                   asp-route-id="@item.ProductId"
+                                   class="btn btn-outline-secondary btn-sm mt-2">Edit</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center text-muted">
+            <p>No products available in this category.</p>
+        </div>
+    }
+</div>
+
+<!-- Footer -->
+<footer class="text-center p-4 mt-5" style="background-color: #f9f2ff;">
+    <p class="text-muted mb-0">© 2025 BabyShop | Made with 💖 in ASP.NET MVC</p>
+</footer>
+
+<style>
+    .btn-pink {
+        background-color: #ffb6c1;
+        color: white;
+        border-radius: 25px;
+    }
+
+        .btn-pink:hover {
+            background-color: #ff9bb3;
+            color: white;
+        }
+</style>

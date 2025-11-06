@@ -1,0 +1,102 @@
+﻿@model BabyShop.Models.HomeViewModel
+
+
+@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- Search Bar -->
+<div class="container mb-5 text-center">
+    <form method="get" asp-action="Index" asp-controller="Home" class="d-flex justify-content-center">
+        <input type="text" name="searchTerm" class="form-control w-50 rounded-start-pill shadow-sm"
+               placeholder="Search for baby products..." value="@Context.Request.Query["searchTerm"]" />
+        <button type="submit" class="btn btn-pink rounded-end-pill px-4 shadow-sm fw-bold">Search</button>
+    </form>
+</div>
+<!-- Hero Image Slider -->
+@if (Model.Sliders != null && Model.Sliders.Any())
+{
+    <div id="babyShopCarousel" class="carousel slide mb-5" data-bs-ride="carousel" data-bs-interval="2000">
+        <div class="carousel-inner">
+            @{
+                var isFirst = true;
+                foreach (var slide in Model.Sliders)
+                {
+                    <div class="carousel-item @(isFirst ? "active" : "")">
+                        <img src="@slide.ImageUrl" class="d-block w-100" alt="Slider Image" style="height: 450px; object-fit: cover;">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h2 class="fw-bold text-white shadow-text">@slide.CaptionTitle</h2>
+                            <p class="text-white">@slide.CaptionText</p>
+                        </div>
+                    </div>
+                    ;
+                    isFirst = false;
+                }
+            }
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#babyShopCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#babyShopCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+}
+
+
+<!-- Product Section -->
+<div class="row">
+    @if (Model.Products != null && Model.Products.Any())
+    {
+        foreach (var item in Model.Products)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm border-0 h-100 text-center">
+                    <img src="@item.ImageUrl"
+                         alt="@item.Name"
+                         class="card-img-top rounded"
+                         style="height: 200px; object-fit: contain;" />
+
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">@item.Name</h5>
+                        <p class="text-muted">@item.Category</p>
+                        <h6 class="text-success fw-bold">₹@item.Price</h6>
+
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId"
+                           class="btn btn-outline-primary btn-sm mt-2">View Details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center text-muted">
+            <p>No products found. Try searching for another item!</p>
+        </div>
+    }
+</div>
+
+
+<!-- Footer -->
+<footer class="text-center p-4 mt-5" style="background-color: #f9f2ff;">
+    <p class="text-muted mb-0">© 2025 BabyShop | Made with 💖 in ASP.NET MVC</p>
+</footer>
+
+<!-- Custom Styles -->
+<style>
+    .btn-pink {
+        background-color: #ffb6c1;
+        color: white;
+        border-radius: 25px;
+    }
+
+        .btn-pink:hover {
+            background-color: #ff9bb3;
+            color: white;
+        }
+
+    .shadow-text {
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
+    }
+</style>
