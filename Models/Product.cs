@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BabyShop.Models
 {
@@ -15,13 +16,13 @@ namespace BabyShop.Models
         [StringLength(50)]
         public string Category { get; set; }
 
-        [Required]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
 
         [StringLength(500)]
         public string Description { get; set; }
 
-        public string? ImageUrl { get; set; }
+        public string ImageUrl { get; set; }
 
     }
 

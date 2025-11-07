@@ -2,11 +2,10 @@ using BabyShop.Models;
 using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+var connectionString = builder.Configuration.GetConnectionString("BabyShopConnection");
 builder.Services.AddDbContext<BabyShopContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BabyShopConnection")));
-
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
