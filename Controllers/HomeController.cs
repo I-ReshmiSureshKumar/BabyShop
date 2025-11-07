@@ -64,7 +64,7 @@ namespace BabyShop.Controllers
         }
         public IActionResult AdminSettings()
         {
-            return View();
+            return View("~/Views/Admin/AdminSettings.cshtml");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

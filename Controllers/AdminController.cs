@@ -47,7 +47,10 @@ namespace BabyShop.Controllers
         {
             return View();
         }
-
+        public IActionResult AdminSettings()
+        {
+            return View();
+        }
         // POST: Admin/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
