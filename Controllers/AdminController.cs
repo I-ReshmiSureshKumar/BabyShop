@@ -1,159 +1,170 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BabyShop.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using BabyShop.Models;
+using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
+using System.IO;
+
+
 
 namespace BabyShop.Controllers
 {
     public class AdminController : Controller
     {
+        private readonly IConfiguration _configuration;
+
         private readonly BabyShopContext _context;
+        private readonly IWebHostEnvironment _env;
 
-        public AdminController(BabyShopContext context)
+        public AdminController(IConfiguration configuration, BabyShopContext context, IWebHostEnvironment env)
         {
+            _configuration = configuration;
             _context = context;
+            _env = env;
         }
 
-        // GET: Admin
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Products.ToListAsync());
-        }
 
-        // GET: Admin/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
-        // GET: Admin/Create
-        public IActionResult Create()
+        // GET: Admin/AdminLogin
+        [HttpGet]
+        public IActionResult AdminLogin()
         {
             return View();
         }
+
+        // POST: Admin/AdminLogin
+        [HttpPost]
+        public IActionResult AdminLogin(string username, string password)
+        {
+            string connectionString = _configuration.GetConnectionString("BabyShopConnection");
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT * FROM UserDetails WHERE UserName=@username AND Password=@password";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@username", username);
+                    cmd.Parameters.AddWithValue("@password", password);
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read()) // login success
+                        {
+                            return RedirectToAction("Dashboard", "Admin");
+                        }
+                        else
+                        {
+                            ViewBag.Error = "Invalid username or password";
+                            return View();
+                        }
+                    }
+                }
+            }
+        }
+
+        public IActionResult Dashboard()
+        {
+            return View();
+        }
+        public IActionResult UserRegistration()
+        {
+            return View();
+        }
+
+        public IActionResult AddProducts()
+        {
+            return PartialView();
+        }
+
+        public IActionResult ViewOrders()
+        {
+            return PartialView();
+        }
+
+        public IActionResult ManageUsers()
+        {
+            return PartialView();
+        }
+
+        public IActionResult Offers()
+        {
+            return PartialView();
+        }
+
         public IActionResult AdminSettings()
         {
-            return View();
+            return PartialView();
         }
-        // POST: Admin/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        public IActionResult HomepageSettings()
+        {
+            return PartialView();
+        }
+        public IActionResult AddNewProducts()
+        {
+            return PartialView();
+        }
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,Name,Category,Price,Description,ImageUrl")] Product product)
+        public async Task<IActionResult> Create(Product model)
         {
-            if (ModelState.IsValid)
+            if (model.ImageFile != null)
             {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(product);
-        }
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
+                string folderPath = Path.Combine("wwwroot/images", fileName);
 
-        // GET: Admin/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            return View(product);
-        }
-
-        // POST: Admin/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,Name,Category,Price,Description,ImageUrl")] Product product)
-        {
-            if (id != product.ProductId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                using (var stream = new FileStream(folderPath, FileMode.Create))
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
+                    await model.ImageFile.CopyToAsync(stream);
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductExists(product.ProductId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(product);
-        }
 
-        // GET: Admin/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
+                model.ImageUrl = "/images/" + fileName;
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
-        // POST: Admin/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var product = await _context.Products.FindAsync(id);
-            if (product != null)
-            {
-                _context.Products.Remove(product);
-            }
-
+            _context.Product.Add(model);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return RedirectToAction("Dashboard");
+        }
+        public IActionResult SliderImagesForm()
+        {
+            var vm = new SliderImageViewModel()
+            {
+                NewSlider = new SliderImage(),
+                SliderImages = _context.SliderImages.ToList()
+            };
+
+            return View(vm);
         }
 
-        private bool ProductExists(int id)
+        [HttpPost]
+        public IActionResult SliderImagesForm(SliderImageViewModel model, IFormFile ImageFile)
         {
-            return _context.Products.Any(e => e.ProductId == id);
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                // Save file
+                string folder = "wwwroot/uploads/sliders/";
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                string filePath = Path.Combine(folder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    ImageFile.CopyTo(stream);
+                }
+
+                model.NewSlider.ImageUrl = "/uploads/sliders/" + fileName;
+            }
+
+            _context.SliderImages.Add(model.NewSlider);
+            _context.SaveChanges();
+
+            return RedirectToAction("SliderImagesForm");
         }
+
     }
 }

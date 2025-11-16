@@ -77,6 +77,45 @@
     }
 </div>
 
+<!-- Category Section -->
+<h3 class="mt-5 mb-3 text-primary">Shop by Category</h3>
+
+<div class="row">
+    @if (Model.Categories != null && Model.Categories.Any())
+    {
+        foreach (var cat in Model.Categories)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm border-0 h-100 text-center">
+
+                    <img src="@cat.ImageUrl"
+                         alt="@cat.CategoryName"
+                         class="card-img-top rounded"
+                         style="height: 180px; object-fit: contain;" />
+
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">@cat.CategoryName</h5>
+
+                        <a asp-controller="Products"
+                           asp-action="ProductsByCategory"
+                           asp-route-id="@cat.Id"
+                           class="btn btn-outline-primary btn-sm mt-2">
+                            View Products
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center text-muted">
+            <p>No categories found.</p>
+        </div>
+    }
+</div>
+
 
 <!-- Footer -->
 <footer class="text-center p-4 mt-5" style="background-color: #f9f2ff;">

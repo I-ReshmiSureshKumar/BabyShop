@@ -22,8 +22,15 @@ namespace BabyShop.Models
         [StringLength(500)]
         public string Description { get; set; }
 
-        public string ImageUrl { get; set; }
-
+        [NotMapped]
+        public IFormFile ImageFile { get; set; }
+        public string ImageUrl { get; internal set; }
+        public int CategoryId { get; internal set; }
+        public string CategoryName { get; internal set; }
+        public int Stock { get; internal set; }
+        public DateTime CreatedDate { get; internal set; }
+        public DateTime? UpdatedDate { get; set; }
+        public bool IsActive { get; internal set; }
     }
 
 }

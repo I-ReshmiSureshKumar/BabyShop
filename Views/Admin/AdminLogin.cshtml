@@ -1,0 +1,41 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card shadow-lg p-4" style="border-radius:20px; border: 2px solid #f8c8dc;">
+                <h3 class="text-center mb-4" style="color:#ff69b4; font-weight:700;">
+                    👶 Create Your Baby Shop Account
+                </h3>
+        <form method="post" asp-controller="Admin" asp-action="AdminLogin">
+
+            <div class="mb-3 text-start">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" required />
+            </div>
+
+            <div class="mb-3 text-start">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" required />
+            </div>
+
+                    <button type="submit" class="btn w-100"
+                            style="background:#ff69b4; color:white; font-weight:bold; border-radius:10px;">
+                        Login
+                    </button>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="error-text">@ViewBag.Error</div>
+            }
+        </form>
+
+        <a href="/" class="back-home">🏠 Back to Home</a>
+
+            </div>
+        </div>
+    </div>
+</div>

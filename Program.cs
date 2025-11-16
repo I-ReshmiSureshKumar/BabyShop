@@ -1,12 +1,16 @@
+using BabyShop.Data;
 using BabyShop.Models;
 using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("BabyShopConnection");
 builder.Services.AddDbContext<BabyShopContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseMySql(builder.Configuration.GetConnectionString("BabyShopConnection"),
+    new MySqlServerVersion(new Version(8, 0, 21))));
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<StoredProcedureService>();
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

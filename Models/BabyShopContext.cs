@@ -9,7 +9,7 @@ namespace BabyShop.Models
         {
         }
 
-        public DbSet<Product> Products { get; set; }
+        public DbSet<Product> Product { get; set; }
         public DbSet<SliderImage> SliderImages { get; set; }
 
     }

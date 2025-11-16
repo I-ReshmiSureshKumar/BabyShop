@@ -1,27 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BabyShop.Data;
+using BabyShop.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using BabyShop.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BabyShop.Controllers
 {
     public class ProductsController : Controller
     {
         private readonly BabyShopContext _context;
+        private readonly StoredProcedureService _sp;
 
-        public ProductsController(BabyShopContext context)
+        public ProductsController(BabyShopContext context, StoredProcedureService sp)
         {
             _context = context;
+            _sp = sp;
         }
 
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            var products = await _context.Products.ToListAsync();
+            var products = await _context.Product.ToListAsync();
             Console.WriteLine($"✅ Total Products Found: {products.Count}");
             return View(products);
         }
@@ -34,7 +37,7 @@ namespace BabyShop.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
+            var product = await _context.Product
                 .FirstOrDefaultAsync(m => m.ProductId == id);
             if (product == null)
             {
@@ -91,7 +94,7 @@ namespace BabyShop.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Product.FindAsync(id);
             if (product == null)
             {
                 return NotFound();
@@ -142,7 +145,7 @@ namespace BabyShop.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
+            var product = await _context.Product
                 .FirstOrDefaultAsync(m => m.ProductId == id);
             if (product == null)
             {
@@ -157,10 +160,10 @@ namespace BabyShop.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Product.FindAsync(id);
             if (product != null)
             {
-                _context.Products.Remove(product);
+                _context.Product.Remove(product);
             }
 
             await _context.SaveChangesAsync();
@@ -169,7 +172,7 @@ namespace BabyShop.Controllers
 
         private bool ProductExists(int id)
         {
-            return _context.Products.Any(e => e.ProductId == id);
+            return _context.Product.Any(e => e.ProductId == id);
         }
     }
 }
