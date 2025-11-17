@@ -2,6 +2,7 @@
 
 BabyShop is an ASP.NET Core MVC e-commerce application designed for selling baby products.
 It includes product management, image upload, and a modern responsive UI with a homepage slider.
+DEMO URL: https://babyshop-qski.onrender.com/
 
 ✨ Features
 
